@@ -1,0 +1,14 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    { "label": "db: up", "type": "shell", "command": "docker compose up -d" },
+    {
+      "label": "db: apply schema",
+      "type": "shell",
+      "command": "docker exec -i $(docker ps -q --filter name=minutes-stack-db-1) psql -U app -d minutesdb < db/schema.sql",
+      "problemMatcher": []
+    },
+    { "label": "api: install", "type": "shell", "command": "pip install -r app/requirements.txt" },
+    { "label": "api: run", "type": "shell", "command": "uvicorn app.main:app --reload --port 8001" }
+  ]
+}

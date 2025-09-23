@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+sqlalchemy>=2.0
+psycopg[binary]
+pydantic
+python-dateutil
+ollama
+pgvector
+python-multipart
+docx2txt
+pdfplumber
