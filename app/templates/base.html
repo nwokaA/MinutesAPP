@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>{% block title %}{{ app_name }}{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/static/css/styles.css"/>
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">M</div>
+        <div>
+          <div class="brand-name">{{ app_name }}</div>
+          <div class="brand-tag">Meeting intelligence</div>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="/" class="nav-link{% if active == 'dashboard' %} active{% endif %}">
+          <span class="nav-icon">◉</span> Dashboard
+        </a>
+        <a href="/app" class="nav-link{% if active == 'upload' %} active{% endif %}">
+          <span class="nav-icon">↑</span> Upload Minutes
+        </a>
+        <a href="/summary-ui" class="nav-link{% if active == 'summary' %} active{% endif %}">
+          <span class="nav-icon">▤</span> Project Summary
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <a href="/health" class="muted-link">System health</a>
+        <a href="/api" class="muted-link">API docs</a>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="page-header">
+        {% block header %}{% endblock %}
+      </header>
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

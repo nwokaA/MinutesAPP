@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% set active = "dashboard" %}
+
+{% block title %}Dashboard — {{ app_name }}{% endblock %}
+
+{% block header %}
+<h1>Dashboard</h1>
+<p class="subtitle">Transform meeting minutes into structured decisions, actions, risks, and project health views.</p>
+{% endblock %}
+
+{% block content %}
+<section class="hero-grid">
+  <a href="/app" class="hero-card hero-card-primary">
+    <div class="hero-icon">↑</div>
+    <h2>Upload Minutes</h2>
+    <p>Parse PDF, DOCX, or TXT files. Extract decisions, actions, risks, issues, and accomplishments automatically.</p>
+    <span class="hero-cta">Start upload →</span>
+  </a>
+  <a href="/summary-ui" class="hero-card">
+    <div class="hero-icon">▤</div>
+    <h2>Project Summary</h2>
+    <p>Generate rolling summaries with overdue actions, risks, and an optional AI plan for the next 7 days.</p>
+    <span class="hero-cta">View summary →</span>
+  </a>
+</section>
+
+<section class="card">
+  <h2 class="section-title">How it works</h2>
+  <ol class="steps">
+    <li><strong>Upload</strong> meeting minutes and associate them with a project.</li>
+    <li><strong>Extract</strong> structured items using a local LLM via Ollama.</li>
+    <li><strong>Search</strong> semantically across past minutes with vector embeddings.</li>
+    <li><strong>Summarize</strong> project health for status updates and leadership briefings.</li>
+  </ol>
+</section>
+
+<section class="card">
+  <h2 class="section-title">REST API</h2>
+  <div class="api-grid">
+    <div class="api-item"><code>POST /ingest</code><span>Ingest raw text</span></div>
+    <div class="api-item"><code>GET /items</code><span>Query extracted items</span></div>
+    <div class="api-item"><code>GET /search</code><span>Semantic search</span></div>
+    <div class="api-item"><code>GET /summary</code><span>Project rollup</span></div>
+    <div class="api-item"><code>GET /projects</code><span>List projects</span></div>
+    <div class="api-item"><code>GET /health</code><span>Service health</span></div>
+  </div>
+</section>
+{% endblock %}

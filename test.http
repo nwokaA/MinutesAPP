@@ -1,9 +1,14 @@
 ### health
-GET http://localhost:8001/
-###Get similarity 
-GET http://localhost:8001/items
+GET http://localhost:8000/health
+
+### API info
+GET http://localhost:8000/api
+
+### list items
+GET http://localhost:8000/items
+
 ### ingest (sample)
-POST http://localhost:8001/ingest
+POST http://localhost:8000/ingest
 Content-Type: application/json
 
 {
@@ -11,5 +16,3 @@ Content-Type: application/json
   "meeting_title": "Weekly sync 2025-09-11",
   "raw_text": "Decision: move vendor A to pilot. Action: Sarah to draft SOW by 2025-09-18. Risk: data feed may slip; owner: IT; severity: 4."
 }
-  
-

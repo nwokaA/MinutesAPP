@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% set active = "upload" %}
+
+{% block title %}Upload Minutes — {{ app_name }}{% endblock %}
+
+{% block header %}
+<h1>Upload Minutes</h1>
+<p class="subtitle">Upload a PDF, DOCX, or TXT file. We'll extract structured items and store them for search and summaries.</p>
+{% endblock %}
+
+{% block content %}
+{% if error %}
+<div class="alert alert-error" role="alert">{{ error }}</div>
+{% endif %}
+
+<section class="card">
+  <form action="/upload" method="post" enctype="multipart/form-data" class="form">
+    <div class="form-grid">
+      <div class="field">
+        <label for="project_name">Project name</label>
+        <input id="project_name" type="text" name="project_name" placeholder="e.g., P1 – ForeSITE" required />
+      </div>
+      <div class="field">
+        <label for="meeting_title">Meeting title</label>
+        <input id="meeting_title" type="text" name="meeting_title" placeholder="e.g., Weekly sync 2025-09-18" required />
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="file">Minutes file</label>
+      <div class="file-drop" id="file-drop">
+        <input id="file" type="file" name="file" accept=".pdf,.docx,.txt,.md" required />
+        <div class="file-drop-label">
+          <span class="file-drop-icon">📄</span>
+          <span id="file-label">Choose a file or drag it here</span>
+          <span class="muted">PDF, DOCX, TXT, or MD — max 10 MB</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary" id="submit-btn">
+        <span class="btn-text">Upload &amp; Extract</span>
+        <span class="btn-spinner hidden" aria-hidden="true"></span>
+      </button>
+    </div>
+  </form>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const fileInput = document.getElementById('file');
+const fileLabel = document.getElementById('file-label');
+const form = document.querySelector('form');
+const submitBtn = document.getElementById('submit-btn');
+
+fileInput.addEventListener('change', () => {
+  fileLabel.textContent = fileInput.files[0]?.name || 'Choose a file or drag it here';
+});
+
+form.addEventListener('submit', () => {
+  submitBtn.disabled = true;
+  submitBtn.querySelector('.btn-text').textContent = 'Processing…';
+  submitBtn.querySelector('.btn-spinner').classList.remove('hidden');
+});
+</script>
+{% endblock %}
