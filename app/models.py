@@ -1,5 +1,5 @@
 from sqlalchemy import (
-    Column, Integer, String, Text, Date, DateTime, Enum, ForeignKey
+    Column, Float, Integer, String, Text, Date, DateTime, Enum, ForeignKey
 )
 from .db import Base
 
@@ -49,4 +49,4 @@ class Item(Base):
     severity = Column(Integer, nullable=True)
     evidence_start = Column(Integer, nullable=True)
     evidence_end = Column(Integer, nullable=True)
-    confidence = Column(Integer, nullable=True)  # change to Float later if you like
+    confidence = Column(Float, nullable=True)

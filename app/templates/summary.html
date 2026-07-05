@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% set active = "summary" %}
+
+{% block title %}Project Summary — {{ app_name }}{% endblock %}
+
+{% block header %}
+<h1>Project Summary</h1>
+<p class="subtitle">Pick a project and time window. Optionally include an AI-generated plan for the next 7 days.</p>
+{% endblock %}
+
+{% block content %}
+<section class="card">
+  <div class="form-grid form-grid-4">
+    <div class="field">
+      <label for="project">Project</label>
+      <select id="project"></select>
+    </div>
+    <div class="field">
+      <label for="days">Days back</label>
+      <input id="days" type="number" min="1" max="60" value="7"/>
+    </div>
+    <div class="field">
+      <label for="plan">Include plan</label>
+      <select id="plan">
+        <option value="false">No</option>
+        <option value="true" selected>Yes</option>
+      </select>
+    </div>
+    <div class="field field-action">
+      <label>&nbsp;</label>
+      <button id="run" class="btn btn-primary btn-block">Generate Summary</button>
+    </div>
+  </div>
+  <div class="field" style="margin-top: 1rem;">
+    <label for="profile">Profile (optional)</label>
+    <textarea id="profile" rows="2" placeholder="e.g., executive concise tone, highlight risks first"></textarea>
+  </div>
+</section>
+
+<div id="out" class="summary-output"></div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/summary.js"></script>
+{% endblock %}

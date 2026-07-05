@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% set active = "upload" %}
+
+{% block title %}Parsed Minutes — {{ app_name }}{% endblock %}
+
+{% block header %}
+<h1>Parsed Minutes</h1>
+<p class="subtitle">Saved under <strong>{{ project_name }}</strong> → <strong>{{ meeting_title }}</strong></p>
+{% endblock %}
+
+{% block content %}
+<div class="actions-bar">
+  <a href="/app" class="btn btn-secondary">Upload another</a>
+  <a href="/summary-ui" class="btn btn-primary">View project summary</a>
+</div>
+
+<section class="card">
+  {% macro section(title, items, badge_class) %}
+    {% if items %}
+    <div class="result-section">
+      <div class="result-header">
+        <h2>{{ title }}</h2>
+        <span class="badge {{ badge_class }}">{{ items|length }}</span>
+      </div>
+      <ul class="item-list">
+        {% for item in items %}
+        <li class="item-card">
+          <div class="item-title">{{ item.title or 'Untitled' }}</div>
+          {% if item.owner or item.due_date or item.date %}
+          <div class="item-meta">
+            {% if item.owner %}<span>Owner: {{ item.owner }}</span>{% endif %}
+            {% if item.due_date or item.date %}<span>Due: {{ item.due_date or item.date }}</span>{% endif %}
+          </div>
+          {% endif %}
+          {% if item.detail %}
+          <p class="item-detail">{{ item.detail }}</p>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+  {% endmacro %}
+
+  {{ section("Decisions", data.get("decisions", []), "badge-decision") }}
+  {{ section("Actions", data.get("actions", []), "badge-action") }}
+  {{ section("Risks", data.get("risks", []), "badge-risk") }}
+  {{ section("Issues", data.get("issues", []), "badge-issue") }}
+  {{ section("Accomplishments", data.get("accomplishments", []), "badge-accomplishment") }}
+
+  {% if not (data.get("decisions") or data.get("actions") or data.get("risks") or data.get("issues") or data.get("accomplishments")) %}
+  <p class="muted">No items were extracted. Try a clearer minutes document or check that Ollama is running.</p>
+  {% endif %}
+</section>
+
+<p class="meta-footer">
+  minutes_id: {{ minutes_id }} · project_id: {{ project_id }} · meeting_id: {{ meeting_id }}
+</p>
+{% endblock %}
