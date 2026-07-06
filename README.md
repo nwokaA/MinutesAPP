@@ -162,12 +162,16 @@ db/
 | `GET` | `/` | Web dashboard |
 | `GET` | `/app` | Upload UI |
 | `GET` | `/summary-ui` | Summary UI |
+| `GET` | `/search-ui` | Semantic search UI |
+| `GET` | `/items-ui` | Item management UI |
+| `GET` | `/health-ui` | Human-friendly health page |
 | `POST` | `/upload` | Upload minutes file |
 | `POST` | `/ingest` | Ingest raw text (JSON) |
 | `GET` | `/items` | List extracted items |
-| `GET` | `/search` | Semantic search |
+| `PATCH` | `/items/{id}` | Update item owner, status, due date |
+| `GET` | `/search` | Semantic search (`detail=true` for excerpts) |
 | `GET` | `/summary` | Project rollup |
 | `GET` | `/projects` | List projects |
 | `POST` | `/reembed` | Backfill embeddings |
-| `GET` | `/health` | Service health |
+| `GET` | `/health` | Service health (JSON) |
 

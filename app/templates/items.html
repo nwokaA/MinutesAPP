@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% set active = "items" %}
+
+{% block title %}Manage Items — {{ app_name }}{% endblock %}
+
+{% block header %}
+<h1>Manage Items</h1>
+<p class="subtitle">Update action owners, due dates, and mark items as done.</p>
+{% endblock %}
+
+{% block content %}
+<section class="card">
+  <div class="form-grid form-grid-4">
+    <div class="field">
+      <label for="filter-project">Project</label>
+      <select id="filter-project">
+        <option value="">All projects</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="filter-type">Type</label>
+      <select id="filter-type">
+        <option value="">All types</option>
+        <option value="action">Action</option>
+        <option value="decision">Decision</option>
+        <option value="risk">Risk</option>
+        <option value="issue">Issue</option>
+        <option value="accomplishment">Accomplishment</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="filter-status">Status</label>
+      <select id="filter-status">
+        <option value="">All statuses</option>
+        <option value="open">Open</option>
+        <option value="in_progress">In progress</option>
+        <option value="done">Done</option>
+      </select>
+    </div>
+    <div class="field field-action">
+      <label>&nbsp;</label>
+      <button id="load-items" class="btn btn-primary btn-block">Load items</button>
+    </div>
+  </div>
+</section>
+
+<div id="items-list" class="items-board"></div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/items.js"></script>
+{% endblock %}

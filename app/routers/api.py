@@ -8,12 +8,22 @@ from sqlalchemy.orm import Session
 
 from app.config import Settings, get_settings
 from app.db import get_db
-from app.schemas import IngestPayload, ProjectOut, SearchResult
-from app.services.ingest import ingest_minutes
+from app.schemas import IngestPayload, ItemOut, ItemUpdate, ProjectOut, SearchResult
+from app.services.ingest import clean_date, ingest_minutes
 from app.services.llm import LLMService
 
 logger = logging.getLogger(__name__)
 router = APIRouter(tags=["api"])
+
+ITEM_TYPES = {"decision", "action", "accomplishment", "risk", "issue", "blocker"}
+ITEM_STATUSES = {"open", "in_progress", "done"}
+
+
+def serialize_item(row: Any) -> dict[str, Any]:
+    item = dict(row)
+    if isinstance(item.get("due_date"), date):
+        item["due_date"] = item["due_date"].isoformat()
+    return item
 
 
 def get_llm(settings: Settings = Depends(get_settings)) -> LLMService:
@@ -52,6 +62,7 @@ def search(
     q: str = Query(..., min_length=1),
     k: int = Query(5, ge=1, le=50),
     project_id: Optional[int] = None,
+    detail: bool = Query(False, description="Include meeting title, excerpt, and project name"),
     db: Session = Depends(get_db),
     llm: LLMService = Depends(get_llm),
 ):
@@ -62,6 +73,39 @@ def search(
         if project_id is not None:
             where += " AND mt.project_id = :pid"
             params["pid"] = project_id
+
+        if detail:
+            rows = db.execute(
+                text(f"""
+                    SELECT
+                      m.id AS minutes_id,
+                      mt.project_id AS project_id,
+                      p.name AS project_name,
+                      mt.title AS meeting_title,
+                      LEFT(m.raw_text, 400) AS excerpt,
+                      m.source_url,
+                      1 - (m.embedding <=> (:qvec)::vector) AS score
+                    FROM minutes m
+                    JOIN meetings mt ON mt.id = m.meeting_id
+                    JOIN projects p ON p.id = mt.project_id
+                    WHERE {where}
+                    ORDER BY m.embedding <=> (:qvec)::vector
+                    LIMIT :k
+                """),
+                params,
+            ).mappings().all()
+            return [
+                SearchResult(
+                    minutes_id=r["minutes_id"],
+                    project_id=r["project_id"],
+                    similarity=float(r["score"]),
+                    project_name=r["project_name"],
+                    meeting_title=r["meeting_title"],
+                    excerpt=r["excerpt"],
+                    source_url=r["source_url"],
+                )
+                for r in rows
+            ]
 
         rows = db.execute(
             text(f"""
@@ -133,16 +177,69 @@ def list_items(
             params,
         ).mappings().all()
 
-        out = []
-        for row in rows:
-            item = dict(row)
-            if isinstance(item.get("due_date"), date):
-                item["due_date"] = item["due_date"].isoformat()
-            out.append(item)
+        out = [serialize_item(row) for row in rows]
         return out
     except Exception as exc:
         logger.exception("List items failed")
         raise HTTPException(status_code=500, detail=f"Items query failed: {exc}") from exc
+
+
+@router.patch("/items/{item_id}", response_model=ItemOut)
+def update_item(
+    item_id: int,
+    payload: ItemUpdate,
+    db: Session = Depends(get_db),
+):
+    updates = payload.model_dump(exclude_unset=True)
+    if not updates:
+        raise HTTPException(status_code=400, detail="No fields to update")
+
+    if "status" in updates and updates["status"] not in ITEM_STATUSES:
+        raise HTTPException(status_code=400, detail="Invalid status")
+
+    if "due_date" in updates:
+        due = updates["due_date"]
+        if due in ("", None):
+            updates["due_date"] = None
+        else:
+            cleaned = clean_date(due)
+            if not cleaned:
+                raise HTTPException(status_code=400, detail="due_date must be YYYY-MM-DD")
+            updates["due_date"] = cleaned
+
+    if "owner" in updates and updates["owner"] is not None:
+        updates["owner"] = updates["owner"].strip() or None
+
+    if "title" in updates and updates["title"] is not None:
+        updates["title"] = updates["title"].strip() or None
+
+    set_clause = ", ".join(f"{key} = :{key}" for key in updates)
+    params = {**updates, "id": item_id}
+
+    try:
+        result = db.execute(
+            text(f"""
+                UPDATE items
+                SET {set_clause}
+                WHERE id = :id
+                RETURNING id, minutes_id, project_id, type, title, detail, owner,
+                          due_date, status, priority, severity, confidence
+            """),
+            params,
+        ).mappings().first()
+
+        if not result:
+            raise HTTPException(status_code=404, detail="Item not found")
+
+        db.commit()
+        return serialize_item(result)
+    except HTTPException:
+        db.rollback()
+        raise
+    except Exception as exc:
+        db.rollback()
+        logger.exception("Update item failed")
+        raise HTTPException(status_code=500, detail=f"Update failed: {exc}") from exc
 
 
 @router.get("/summary")

@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <script src="/static/js/theme.js"></script>
   <title>{% block title %}{{ app_name }}{% endblock %}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -30,9 +31,19 @@
         <a href="/summary-ui" class="nav-link{% if active == 'summary' %} active{% endif %}">
           <span class="nav-icon">▤</span> Project Summary
         </a>
+        <a href="/search-ui" class="nav-link{% if active == 'search' %} active{% endif %}">
+          <span class="nav-icon">⌕</span> Search
+        </a>
+        <a href="/items-ui" class="nav-link{% if active == 'items' %} active{% endif %}">
+          <span class="nav-icon">☑</span> Manage Items
+        </a>
       </nav>
       <div class="sidebar-footer">
-        <a href="/health" class="muted-link">System health</a>
+        <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+          <span class="theme-icon-dark">☀ Light mode</span>
+          <span class="theme-icon-light">☾ Dark mode</span>
+        </button>
+        <a href="/health-ui" class="muted-link{% if active == 'health' %} active-footer{% endif %}">System health</a>
         <a href="/api" class="muted-link">API docs</a>
       </div>
     </aside>

@@ -58,7 +58,10 @@ def create_app() -> FastAPI:
             "ui": "/",
             "upload": "/app",
             "summary": "/summary-ui",
-            "health": "/health",
+            "search": "/search-ui",
+            "items": "/items-ui",
+            "health": "/health-ui",
+            "health_json": "/health",
         }
 
     return app

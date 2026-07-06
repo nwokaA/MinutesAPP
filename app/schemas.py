@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any, Literal, Optional
 
 from pydantic import BaseModel, Field
 
@@ -26,6 +26,17 @@ class SearchResult(BaseModel):
     minutes_id: int
     project_id: int
     similarity: float
+    project_name: Optional[str] = None
+    meeting_title: Optional[str] = None
+    excerpt: Optional[str] = None
+    source_url: Optional[str] = None
+
+
+class ItemUpdate(BaseModel):
+    status: Optional[Literal["open", "in_progress", "done"]] = None
+    owner: Optional[str] = Field(None, max_length=500)
+    due_date: Optional[str] = Field(None, description="YYYY-MM-DD or empty to clear")
+    title: Optional[str] = Field(None, max_length=500)
 
 
 class ItemOut(BaseModel):
