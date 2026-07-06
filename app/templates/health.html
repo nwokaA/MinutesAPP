@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% set active = "health" %}
+
+{% block title %}System Health — {{ app_name }}{% endblock %}
+
+{% block header %}
+<h1>System Health</h1>
+<p class="subtitle">Status of core services powering MinutesAPP.</p>
+{% endblock %}
+
+{% block content %}
+<section class="card">
+  <div class="health-overall health-{{ health.status }}">
+    <div class="health-overall-icon">
+      {% if health.status == 'healthy' %}✓{% elif health.status == 'degraded' %}!{% else %}✕{% endif %}
+    </div>
+    <div>
+      <div class="health-overall-label">Overall status</div>
+      <div class="health-overall-value">{{ health.status | capitalize }}</div>
+      <div class="muted">Version {{ health.version }}</div>
+    </div>
+  </div>
+</section>
+
+<section class="health-grid">
+  <div class="card health-card">
+    <div class="health-card-header">
+      <h2>Database</h2>
+      <span class="status-pill {% if health.db_ok %}status-ok{% else %}status-error{% endif %}">
+        {% if health.db_ok %}Connected{% else %}Error{% endif %}
+      </span>
+    </div>
+    <p class="health-desc">PostgreSQL with pgvector stores projects, minutes, and embeddings.</p>
+    {% if not health.db_ok %}
+    <p class="health-detail">{{ health.db }}</p>
+    {% endif %}
+  </div>
+
+  <div class="card health-card">
+    <div class="health-card-header">
+      <h2>Ollama (AI)</h2>
+      <span class="status-pill {% if health.ollama_ok %}status-ok{% else %}status-warn{% endif %}">
+        {% if health.ollama_ok %}Running{% else %}Unavailable{% endif %}
+      </span>
+    </div>
+    <p class="health-desc">Local LLM for extracting items from minutes and generating plans.</p>
+    {% if not health.ollama_ok %}
+    <p class="health-detail">Start Ollama and pull the required models to enable AI features.</p>
+    {% endif %}
+  </div>
+</section>
+
+<section class="card">
+  <h2 class="section-title">What this means</h2>
+  <ul class="steps">
+    <li><strong>Healthy</strong> — everything is working. Upload, search, and summaries should run normally.</li>
+    <li><strong>Degraded</strong> — database is up but Ollama is offline. Browsing works; AI extraction won't.</li>
+    <li><strong>Unhealthy</strong> — database is unreachable. Check that Postgres is running.</li>
+  </ul>
+  <p class="muted" style="margin-top: 1rem;">
+    <a href="/health-ui">Refresh</a> ·
+    <a href="/health" target="_blank" rel="noopener">Raw JSON for monitoring</a>
+  </p>
+</section>
+{% endblock %}

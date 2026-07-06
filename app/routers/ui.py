@@ -99,3 +99,39 @@ def summary_ui(request: Request, settings: Settings = Depends(get_settings)):
         "summary.html",
         {"request": request, "app_name": settings.app_name},
     )
+
+
+@router.get("/search-ui", response_class=HTMLResponse)
+def search_ui(request: Request, settings: Settings = Depends(get_settings)):
+    return templates.TemplateResponse(
+        "search.html",
+        {"request": request, "app_name": settings.app_name},
+    )
+
+
+@router.get("/items-ui", response_class=HTMLResponse)
+def items_ui(request: Request, settings: Settings = Depends(get_settings)):
+    return templates.TemplateResponse(
+        "items.html",
+        {"request": request, "app_name": settings.app_name},
+    )
+
+
+@router.get("/health-ui", response_class=HTMLResponse)
+def health_ui(
+    request: Request,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    llm: LLMService = Depends(get_llm),
+):
+    from app.services.health import check_health
+
+    health = check_health(db, settings, llm)
+    return templates.TemplateResponse(
+        "health.html",
+        {
+            "request": request,
+            "app_name": settings.app_name,
+            "health": health,
+        },
+    )
